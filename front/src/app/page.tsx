@@ -15,7 +15,7 @@ interface TimestampProps {
 
 const Timestamp: React.FC<TimestampProps> = ({ timestamp }) => {
   return (
-    <div className="text-xs text-gray-500">{timestamp}</div>
+    <div className="text-xs">{timestamp}</div>
   );
 };
 
@@ -199,7 +199,10 @@ export default function Page() {
       {/* Display the timestamp */}
       {currentAccount && displayTimestamp && (
         <Timestamp 
-          timestamp={obtainedTimestamp} 
+          timestamp={
+            (new Date(Number(obtainedTimestamp)).toLocaleDateString()) + " " +
+            (new Date(Number(obtainedTimestamp)).toLocaleTimeString())
+          } 
         />
       )}
 
