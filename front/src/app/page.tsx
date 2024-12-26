@@ -2,7 +2,7 @@
 "use client"; 
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
-import { createHash } from "crypto";
+// import { createHash } from "crypto";
 
 import { hashFile } from "../utils/hashFile";
 
