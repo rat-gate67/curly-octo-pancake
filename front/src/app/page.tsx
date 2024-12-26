@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"; 
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
@@ -74,6 +75,7 @@ export default function Page() {
 
   const setTimestamp = async () => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { ethereum } = window as any;
       if (ethereum) {
         const provider = new ethers.BrowserProvider(ethereum);
