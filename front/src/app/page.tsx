@@ -4,6 +4,8 @@ import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { createHash } from "crypto";
 
+import { hashFile } from "../utils/hashFile";
+
 import abi from "../utils/TimeStamp.json";
 
 const buttonStyle = "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
@@ -31,7 +33,10 @@ export default function Page() {
   const [obtainedTimestamp, setObtainedTimestamp] = useState<string>("");
 
   // a variable to store the input value
-  const [inputValue, setInputValue] = useState<string>("");
+  // const [inputValue, setInputValue] = useState<string>("");
+
+  // a variable to store the file
+  const [file, setFile] = useState<File>();
 
   const contractAddress = "0xF02d6E666e309E75108F4676d3b99af52678d766";
   const contractABI = abi.abi;
@@ -75,7 +80,6 @@ export default function Page() {
 
   const setTimestamp = async () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { ethereum } = window as any;
       if (ethereum) {
         const provider = new ethers.BrowserProvider(ethereum);
@@ -86,11 +90,15 @@ export default function Page() {
           signer
         );
 
-        const hash = createHash("sha256");
-        hash.update(inputValue);
-        const hashValue = BigInt("0x" + hash.digest("hex"));
-        console.log("inputValue:", inputValue);
-        console.log("hash:", hashValue.toString());
+        // const hash = createHash("sha256");
+        // hash.update(inputValue);
+        // const hashValue = BigInt("0x" + hash.digest("hex"));
+        // console.log("inputValue:", inputValue);
+        // console.log("hash:", hashValue.toString());
+
+        const hashValue = BigInt("0x" + (await hashFile(file!)));
+
+        console.log("hashValue:", hashValue.toString());
 
         // get the current timestamp
         const timestamp = await BigInt(Date.now());
@@ -121,11 +129,13 @@ export default function Page() {
           signer
         );
 
-        const hash = createHash("sha256");
-        hash.update(inputValue);
-        const hashValue = BigInt("0x" + hash.digest("hex"));
-        console.log("inputValue:", inputValue);
-        console.log("hash:", hashValue.toString());
+        // const hash = createHash("sha256");
+        // hash.update(inputValue);
+        // const hashValue = BigInt("0x" + hash.digest("hex"));
+        // console.log("inputValue:", inputValue);
+        // console.log("hash:", hashValue.toString());
+
+        const hashValue = BigInt(await hashFile(file!));
 
         const obtainedTimestamp = await timestampContract.getTimestamp(hashValue);
         console.log("obtainedTimestamp:", obtainedTimestamp.toString());
@@ -150,7 +160,7 @@ export default function Page() {
       <div>
         {/* The input field for the input value */}
         {/* TODO : calulate input value from file */}
-        {currentAccount && (
+        {/* {currentAccount && (
           <input
             placeholder="Enter the input value"
             value={inputValue}
@@ -159,7 +169,16 @@ export default function Page() {
             name="inputValue"
             ></input>
             
-        )}
+        )} */}
+      </div>
+      <div>
+        {/* The input field for the file */}
+        <input
+          type="file"
+          id="file"
+          name="file"
+          onChange={(e) => {setFile(e.target.files![0])}}
+          ></input>
       </div>
 
 
