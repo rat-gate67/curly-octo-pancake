@@ -1,6 +1,9 @@
 "use client"; 
-import { connect } from "http2";
+import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
+import { createHash } from "crypto";
+
+import abi from "../utils/TimeStamp.json";
 
 const buttonStyle = "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
 
@@ -23,8 +26,15 @@ export default function Page() {
   // a variable to display the timestamp
   const [displayTimestamp, setDisplayTimestamp] = useState(false);
 
-  // a variable to store the hash value
-  const [hashValue, setHashValue] = useState<string>("");
+  // a variable to store the timestamp
+  const [obtainedTimestamp, setObtainedTimestamp] = useState<string>("");
+
+  // a variable to store the input value
+  const [inputValue, setInputValue] = useState<string>("");
+
+  const contractAddress = "0xF02d6E666e309E75108F4676d3b99af52678d766";
+  const contractABI = abi.abi;
+
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window as any;
@@ -62,6 +72,70 @@ export default function Page() {
     }
   }
 
+  const setTimestamp = async () => {
+    try {
+      const { ethereum } = window as any;
+      if (ethereum) {
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const timestampContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        const hash = createHash("sha256");
+        hash.update(inputValue);
+        const hashValue = BigInt("0x" + hash.digest("hex"));
+        console.log("inputValue:", inputValue);
+        console.log("hash:", hashValue.toString());
+
+        // get the current timestamp
+        const timestamp = await BigInt(Date.now());
+        console.log("timestamp:", timestamp);
+
+        const timestampTxn = await timestampContract.setTimestamp(hashValue, timestamp);
+        console.log("Mining...", timestampTxn.hash);
+        await timestampTxn.wait();
+        console.log("Mined --", timestampTxn.hash);
+        
+      }else{
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getTimestamp = async () => {
+    try {
+      const { ethereum } = window as any;
+      if (ethereum) {
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const timestampContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        const hash = createHash("sha256");
+        hash.update(inputValue);
+        const hashValue = BigInt("0x" + hash.digest("hex"));
+        console.log("inputValue:", inputValue);
+        console.log("hash:", hashValue.toString());
+
+        const obtainedTimestamp = await timestampContract.getTimestamp(hashValue);
+        console.log("obtainedTimestamp:", obtainedTimestamp.toString());
+        setObtainedTimestamp(obtainedTimestamp.toString());
+        setDisplayTimestamp(true);
+
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -72,15 +146,15 @@ export default function Page() {
         Timestamp
       </h1>
       <div>
-        {/* The input field for the hash value */}
-        {/* TODO : calulate hash value from file */}
+        {/* The input field for the input value */}
+        {/* TODO : calulate input value from file */}
         {currentAccount && (
           <input
-            placeholder="Enter the hash value"
-            value={hashValue}
-            onChange={(e) => {setHashValue(e.target.value)}}
-            id="hashValue"
-            name="hashValue"
+            placeholder="Enter the input value"
+            value={inputValue}
+            onChange={(e) => {setInputValue(e.target.value)}}
+            id="inputValue"
+            name="inputValue"
             ></input>
             
         )}
@@ -105,10 +179,10 @@ export default function Page() {
         </button>
       )}
 
-      {/* The button to submit the hash value */}
+      {/* The button to submit the input value */}
       <button
         className={buttonStyle}
-        // onClick={setTimestamp}
+        onClick={setTimestamp}
       >
         set timestamp
       </button>
@@ -116,14 +190,14 @@ export default function Page() {
       {/* The button to get the timestamp of the file */}
       <button
         className={buttonStyle}
-        // onClick={getTimestamp}
+        onClick={getTimestamp}
       >get timestamp
       </button>
 
       {/* Display the timestamp */}
       {currentAccount && displayTimestamp && (
         <Timestamp 
-          timestamp="timestamp" 
+          timestamp={obtainedTimestamp} 
         />
       )}
 
