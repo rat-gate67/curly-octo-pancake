@@ -219,6 +219,7 @@ export default function Page() {
       {currentAccount && displayTimestamp && (
         <Timestamp 
           timestamp={
+            Number(obtainedTimestamp) === 0 ? "Timestamp not found" :
             (new Date(Number(obtainedTimestamp)).toLocaleDateString()) + " " +
             (new Date(Number(obtainedTimestamp)).toLocaleTimeString())
           } 
