@@ -135,7 +135,7 @@ export default function Page() {
         // console.log("inputValue:", inputValue);
         // console.log("hash:", hashValue.toString());
 
-        const hashValue = BigInt(await hashFile(file!));
+        const hashValue = BigInt("0x" + (await hashFile(file!)));
 
         const obtainedTimestamp = await timestampContract.getTimestamp(hashValue);
         console.log("obtainedTimestamp:", obtainedTimestamp.toString());
